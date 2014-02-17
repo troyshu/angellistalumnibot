@@ -51,7 +51,9 @@ class AngelistQuakerBot:
 				startupIds.append(startup['id'])
 
 				#if we've reached a min follower count, break
-				
+				if followMin and int(startup['follower_count'])<followMin:
+					break
+
 
 			count += perPage
 			#if we reached the end
@@ -59,6 +61,9 @@ class AngelistQuakerBot:
 				break
 			#if we reached more than topPct of most popular startups (by followers)
 			if count > topPct*float(search_response['total']):
+				break
+			#if we've reached a min follower count, break
+			if followMin and int(startup['follower_count'])<followMin:
 				break
 
 			pageCount += 1
