@@ -38,7 +38,8 @@ class AngelistQuakerBot:
 		pageCount = 1
 		count = 0
 		perPage = 50
-		while True:
+		stop = False
+		while not stop:
 			print 'getting page %s of startups...' % (pageCount)
 
 			#get most popular startups first
@@ -50,25 +51,28 @@ class AngelistQuakerBot:
 			for startup in startups:
 				startupIds.append(startup['id'])
 
+				#if start up is hidden, continue
+				if startup['hidden']:
+					continue
+					
 				#if we've reached a min follower count, break
 				if followMin and int(startup['follower_count'])<followMin:
+					stop = True
 					break
 
 
 			count += perPage
 			#if we reached the end
-			if count > int(search_response['total']):
-				break
+			if count >= int(search_response['total']):
+				stop = True
 			#if we reached more than topPct of most popular startups (by followers)
 			if count > topPct*float(search_response['total']):
-				break
-			#if we've reached a min follower count, break
-			if followMin and int(startup['follower_count'])<followMin:
-				break
+				stop = True
+
 
 			pageCount += 1
 
-			ipdb.set_trace()
+			
 
 
 
