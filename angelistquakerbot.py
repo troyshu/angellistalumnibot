@@ -34,7 +34,7 @@ class AngelistQuakerBot:
 		getLocationId = self.locationTagIdMap[city]
 
 		#get all startups in city
-		startupIds = []
+		startupUrls = []
 		pageCount = 1
 		count = 0
 		perPage = 50
@@ -45,15 +45,17 @@ class AngelistQuakerBot:
 			#get most popular startups first
 			search_response = self.al.getTagsStartups(self.al.access_token, getLocationId, order='popularity', per_page = perPage, page=pageCount)
 
-			#extract all startup ids
+			#extract all startup urls
 			startups = search_response['startups']
 
 			for startup in startups:
-				startupIds.append(startup['id'])
-
 				#if start up is hidden, continue
 				if startup['hidden']:
 					continue
+
+				startupUrls.append(startup['angellist_url'])
+
+				
 
 				#if we've reached a min follower count, break
 				if followMin and int(startup['follower_count'])<followMin:
@@ -75,25 +77,28 @@ class AngelistQuakerBot:
 
 			pageCount += 1
 		
-		return startupIds
+		return startupUrls
 		
-	def _findFounders(self, startupIds):
+	def _scrapeStartupPageForFounder(self, startupUrl):
+		return
+
+	def _getFounders(self, startupUrls):
 		#get startup page
-		for startupId in startupIds:
-			startupResponse = self.al.getStartups(self.al.access_token, startupId)
+		for startupUrl in startupUrls:
+			
+			#scrape founder pages from startup page
+			founderName = self._scrapeStartupPageForFounder(startupUrl)
 
 			ipdb.set_trace()
 
 	def findFounderAlumni(self, city='NYC', school='Penn', topPct = 0.10, followMin = None):
 		#get all startups in city
-		startupIds = self._findStartups(city, topPct, followMin)
+		startupUrls = self._findStartups(city, topPct, followMin)
 
 		#get founders of each startup
-		founderIds = self._findFounders(startupIds)
+		founders = self._getFounders(startupUrls)
 
 		#for each founder, find out if graduated from school
-
-
 
 
 
