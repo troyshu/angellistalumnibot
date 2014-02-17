@@ -54,9 +54,10 @@ class AngelistQuakerBot:
 				#if start up is hidden, continue
 				if startup['hidden']:
 					continue
-					
+
 				#if we've reached a min follower count, break
 				if followMin and int(startup['follower_count'])<followMin:
+					print 'reached min follower count of %s' % followMin
 					stop = True
 					break
 
@@ -64,14 +65,17 @@ class AngelistQuakerBot:
 			count += perPage
 			#if we reached the end
 			if count >= int(search_response['total']):
+				print 'reached the end of AngelList startups for %s' % city
 				stop = True
 			#if we reached more than topPct of most popular startups (by followers)
 			if count > topPct*float(search_response['total']):
+				print 'finished grabbing top %s of startups by follower count' % topPct
 				stop = True
 
 
 			pageCount += 1
-
+		
+		ipdb.set_trace()
 			
 
 
