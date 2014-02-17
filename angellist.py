@@ -340,11 +340,18 @@ class AngelList(object):
       return self.do_get_request('%s/1/tags/%s/parents?access_token=%s' % (self.API_ENDPOINT, tag_id, self.access_token))
 
     # (GET)    https://api.angel.co/1/tags/:id/startups
-    def getTagsStartups(self, access_token = None, tag_id = None):
+    def getTagsStartups(self, access_token = None, tag_id = None, order = None, per_page = None, page = None):
       self.check_access_token(access_token)
+      url = '%s/1/tags/%s/startups?access_token=%s' % (self.API_ENDPOINT, tag_id, self.access_token)
       if tag_id is None:
         raise AngelListError("the tag_id param is required for this api call.")
-      return self.do_get_request('%s/1/tags/%s/startups?access_token=%s' % (self.API_ENDPOINT, tag_id, self.access_token))
+      if order:
+        url = '%s&order=%s' % (url, order)
+      if per_page:
+        url = '%s&per_page=%s' % (url, per_page)
+      if page:
+        url = '%s&page=%s' % (url, page)
+      return self.do_get_request(url)
 
     ##########################################################
     # Users (http://angel.co/api/spec/users)
@@ -375,3 +382,26 @@ class AngelList(object):
     def getMe(self, access_token = None):
       self.check_access_token(access_token)
       return self.do_get_request('%s/1/me?access_token=%s' % (self.API_ENDPOINT, self.access_token))
+
+
+
+    ##########################################################
+    # Search (https://angel.co/api/spec/search)
+    # (GET)    https://api.angel.co/1/search?query=:1&type=:2
+    def getSearch(self, access_token = None, query='', atype='User'):
+      self.check_access_token(access_token)
+      url = '%s/1/search?access_token=%s' % (self.API_ENDPOINT, self.access_token)
+      url = '%s&query=%s' % (url, query)
+      url = '%s&type=%s' % (url, atype)
+
+
+
+      try:
+        results = self.do_get_request(url)
+      except:
+        # couldn't find any results so just return an empty object
+        results = json.loads('{}')
+      return results, url
+
+
+
