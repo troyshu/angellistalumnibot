@@ -5,7 +5,6 @@ import ipdb as ipdb
 import re
 import angellist
 reload(angellist)
-from werkzeug.urls import *
 import urllib2
 from progressbar import *
 
@@ -37,6 +36,7 @@ class AngellistQuakerBot:
 
 		#get all startups in city
 		startupUrls = []
+		startups = []
 		pageCount = 1
 		count = 0
 		perPage = 50
@@ -56,7 +56,7 @@ class AngellistQuakerBot:
 					continue
 
 				startupUrls.append(startup['angellist_url'])
-
+				startups.append(startup['name'])
 				
 
 				#if we've reached a min follower count, break
@@ -79,7 +79,8 @@ class AngellistQuakerBot:
 
 			pageCount += 1
 		
-		return startupUrls
+		
+		return startupUrls, startups
 		
 	def _scrapeStartupPageForFounder(self, startupUrl):
 		response = urllib2.urlopen(startupUrl)
@@ -98,8 +99,13 @@ class AngellistQuakerBot:
 		else:
 			return None
 
-	def _getFounderIdFromName(self, founderName):
+	def _getFounderPageFromName(self, founderName):
 		#search angellist for foundername
+		results = self.al.getSearch(self.al.access_token, query = founderName)
+		
+		#get first result's page
+		return results[0][0]['url']
+
 
 	def _getFounders(self, startupUrls):
 		founderNames = []
@@ -120,29 +126,67 @@ class AngellistQuakerBot:
 		pbar.finish()
 
 		#for each founder name, search, grab id
-		print 'getting founder id for each founder...'
-		pbar = ProgressBar(maxval=len(len(founderNames)))
+		print 'getting founder page for each founder...'
+		pbar = ProgressBar(maxval=len(founderNames))
 		pbar.start()
 		count = 0
-		founderIds = []
+		founderPages = []
 		for founderName in founderNames:
-			founderId = self._getFounderIdFromName(founderName)
-			founderIds.append(founderId)
+			founderPage = self._getFounderPageFromName(founderName)
+			founderPages.append(founderPage)
 			count+=1
 			pbar.update(count)
 		pbar.finish()
 
+		return founderPages, founderNames 
+
+
+	def _scrapePageForCollegeTag(self, founderPage):
+		response = urllib2.urlopen(founderPage)
+		page_source = response.read()
+		lines = page_source.split('\n')
+		for line in lines:
+			if 'college-tag' in line:
+				try:
+					college = re.findall(r'college\-tag\"><a href=.*>(.*)</a>',line)[0]
+					if college:
+						return college
+					else:
+						return None
+				except:
+					return None
+				
+	def _isAlumni(self, inputText, school):
+		ipdb.set_trace()
+
+	def _isCollegeTag(self, school, founderPage):
+		#scrape founder page for college tag, compare
+		college = self._scrapePageForCollegeTag(founderPage)
+
+		isAlumni = self._isAlumni(college, school)
+
+		ipdb.set_trace()
+
+	def _getIsAlumniFromPage(self, school, foundersAndPages):
+
+		for founder, founderPage in foundersAndPages:
+			#check if college tag matches
+			collegeTagMatches = self._isCollegeTag(school, founderPage)
+
+			#if not collegeTagMatches:
+				#check linkedin
+
+			ipdb.set_trace()
 
 	def findFounderAlumni(self, city='NYC', school='Penn', topPct = 0.10, followMin = None):
 		#get all startups in city
-		startupUrls = self._findStartups(city, topPct, followMin)
+		startupUrls, startupNames = self._findStartups(city, topPct, followMin)
 
 		#get founders of each startup
-		founders = self._getFounders(startupUrls)
+		founderPages, founders = self._getFounders(startupUrls)
 
-		#for each founder, find out if graduated from school
-
-
+		#for each founder, find out if belong to input school: first angellist tag, then linkedin
+		isAlumni = self._getIsAlumniFromPage(school, zip(founders, founderPages))
 
 		
 	

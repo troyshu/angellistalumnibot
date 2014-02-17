@@ -9,6 +9,7 @@
 
 import hashlib
 import urllib, urllib2
+from werkzeug.urls import *
 
 try:
     import simplejson as json
@@ -389,13 +390,12 @@ class AngelList(object):
     # Search (https://angel.co/api/spec/search)
     # (GET)    https://api.angel.co/1/search?query=:1&type=:2
     def getSearch(self, access_token = None, query='', atype='User'):
+
       self.check_access_token(access_token)
       url = '%s/1/search?access_token=%s' % (self.API_ENDPOINT, self.access_token)
       url = '%s&query=%s' % (url, query)
       url = '%s&type=%s' % (url, atype)
-
-
-
+      url = url_fix(url)
       try:
         results = self.do_get_request(url)
       except:
