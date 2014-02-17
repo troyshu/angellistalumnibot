@@ -90,19 +90,24 @@ class AngelistQuakerBot:
 			if '<meta content=\'FOUNDER\'' in line:
 				founderLine = lines[lineCount+1]
 				break
-		
-		founderName = re.findall(r'<meta content=\'(.*)\' name=',founderLine)[0]
-
-		return founderName
+		if founderLine:
+			founderName = re.findall(r'<meta content=\'(.*)\' name=',founderLine)[0]
+			return founderName
+		else:
+			return None
 
 	def _getFounders(self, startupUrls):
+		founderNames = []
 		#get startup page
 		for startupUrl in startupUrls:
-			
 			#scrape founder pages from startup page
 			founderName = self._scrapeStartupPageForFounder(startupUrl)
+			if founderName:
+				founderNames.append(founderName)
 
-			ipdb.set_trace()
+		ipdb.set_trace()
+		#for each founder name, search, grab id
+
 
 	def findFounderAlumni(self, city='NYC', school='Penn', topPct = 0.10, followMin = None):
 		#get all startups in city
