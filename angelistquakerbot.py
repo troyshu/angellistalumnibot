@@ -28,7 +28,7 @@ class AngelistQuakerBot:
 		}
 
 
-	def _findStartups(self, city='NYC', topPct = 0.10, followMin = None):
+	def _findStartups(self, city, topPct, followMin):
 		print 'getting all startups in %s:' % city
 
 		getLocationId = self.locationTagIdMap[city]
@@ -77,8 +77,21 @@ class AngelistQuakerBot:
 		
 		return startupIds
 		
+	def _findFounders(self, startupIds):
+		#get startup page
+		for startupId in startupIds:
+			startupResponse = self.al.getStartups(self.al.access_token, startupId)
 
-			
+			ipdb.set_trace()
+
+	def findFounderAlumni(self, city='NYC', school='Penn', topPct = 0.10, followMin = None):
+		#get all startups in city
+		startupIds = self._findStartups(city, topPct, followMin)
+
+		#get founders of each startup
+		founderIds = self._findFounders(startupIds)
+
+		#for each founder, find out if graduated from school
 
 
 
