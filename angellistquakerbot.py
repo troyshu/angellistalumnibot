@@ -19,7 +19,7 @@ from progressbar import *
 #######################################################################################
 
 
-class AngelistQuakerBot:
+class AngellistQuakerBot:
 	def __init__(self):
 		self.al = angellist.AngelList()
 		self.al.access_token = '436c4e00aa39c52f0c04e68a5373d407'
@@ -98,6 +98,9 @@ class AngelistQuakerBot:
 		else:
 			return None
 
+	def _getFounderIdFromName(self, founderName):
+		#search angellist for foundername
+
 	def _getFounders(self, startupUrls):
 		founderNames = []
 		print 'scraping founder names...'
@@ -116,8 +119,18 @@ class AngelistQuakerBot:
 		
 		pbar.finish()
 
-		ipdb.set_trace()
 		#for each founder name, search, grab id
+		print 'getting founder id for each founder...'
+		pbar = ProgressBar(maxval=len(len(founderNames)))
+		pbar.start()
+		count = 0
+		founderIds = []
+		for founderName in founderNames:
+			founderId = self._getFounderIdFromName(founderName)
+			founderIds.append(founderId)
+			count+=1
+			pbar.update(count)
+		pbar.finish()
 
 
 	def findFounderAlumni(self, city='NYC', school='Penn', topPct = 0.10, followMin = None):

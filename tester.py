@@ -1,6 +1,6 @@
-import angelistquakerbot
-reload(angelistquakerbot)
-from angelistquakerbot import AngelistQuakerBot
+import angellistquakerbot
+reload(angellistquakerbot)
+from angellistquakerbot import AngellistQuakerBot
 
-bot = AngelistQuakerBot()
-bot.findFounderAlumni(followMin = 700)
+bot = AngellistQuakerBot()
+bot.findFounderAlumni(followMin = 10000)
