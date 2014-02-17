@@ -7,6 +7,7 @@ import angellist
 reload(angellist)
 from werkzeug.urls import *
 import urllib2
+from progressbar import *
 
 #######################################################################################
 # Scrapes AngelList for Upenn alumni.							                      #
@@ -84,6 +85,7 @@ class AngelistQuakerBot:
 		response = urllib2.urlopen(startupUrl)
 		page_source = response.read()
 		lines = page_source.split('\n')
+		founderLine = ''
 		#hacky: use regex to scrape founder's name
 		for lineCount in range(0,len(lines)):
 			line = lines[lineCount]
@@ -98,12 +100,21 @@ class AngelistQuakerBot:
 
 	def _getFounders(self, startupUrls):
 		founderNames = []
+		print 'scraping founder names...'
+		pbar = ProgressBar(maxval=len(startupUrls))
+		pbar.start()
 		#get startup page
+		count = 0
 		for startupUrl in startupUrls:
 			#scrape founder pages from startup page
 			founderName = self._scrapeStartupPageForFounder(startupUrl)
 			if founderName:
 				founderNames.append(founderName)
+			
+			count+=1
+			pbar.update(count)
+		
+		pbar.finish()
 
 		ipdb.set_trace()
 		#for each founder name, search, grab id
