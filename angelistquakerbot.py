@@ -75,7 +75,9 @@ class AngelistQuakerBot:
 
 			pageCount += 1
 		
-		ipdb.set_trace()
+		return startupIds
+		
+
 			
 
 
