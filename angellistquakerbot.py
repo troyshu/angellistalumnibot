@@ -155,28 +155,50 @@ class AngellistQuakerBot:
 						return None
 				except:
 					return None
-				
-	def _isAlumni(self, inputText, school):
-		ipdb.set_trace()
+	
+	def _isPennAlumni(self, inputText):
+		inputText = inputText.lower()
+		if 'penn' in inputText and 'penn state' not in inputText:
+			return True
+		else:
+			return False
 
-	def _isCollegeTag(self, school, founderPage):
+	def _isAlumni(self, inputText, school):
+		#checks if given input text tells us if is alumni of school
+		if school=='Penn':
+			return self._isPennAlumni(inputText)
+		else:
+			raise Exception('alumni checking method for school %s not implemented yet' % school)
+
+
+	def _checkCollegeTag(self, school, founderPage):
 		#scrape founder page for college tag, compare
 		college = self._scrapePageForCollegeTag(founderPage)
-
-		isAlumni = self._isAlumni(college, school)
-
-		ipdb.set_trace()
+		#if we found a college tag
+		if college:
+			isAlumni = self._isAlumni(college, school)
+			return isAlumni
+		else:
+			return None
+		
+	def 
 
 	def _getIsAlumniFromPage(self, school, foundersAndPages):
-
+		
+		founderIsAlumni = {}
 		for founder, founderPage in foundersAndPages:
 			#check if college tag matches
-			collegeTagMatches = self._isCollegeTag(school, founderPage)
-
-			#if not collegeTagMatches:
+			isAlmaMaterAngellist = self._checkCollegeTag(school, founderPage)
+			
+			if isAlmaMaterAngellist==None:
 				#check linkedin
+				isAlmaMaterLinkedin = self._checkLinkedinAlmaMater(school, founderPage)
+				ipdb.set_trace()
+			else:
+				founderIsAlumni[founder] = isAlmaMaterAngellist
 
-			ipdb.set_trace()
+		ipdb.set_trace()
+		return founderIsAlumni
 
 	def findFounderAlumni(self, city='NYC', school='Penn', topPct = 0.10, followMin = None):
 		#get all startups in city
