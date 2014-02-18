@@ -10,7 +10,7 @@ from progressbar import *
 from pandas import DataFrame
 
 #######################################################################################
-# Scrapes AngelList for alumni.							                      #
+# Scrapes AngelList for alumni.							                              #
 #                                                                                     #
 # Author: Troy Shu                                                                    #
 # Email : tmshu1@gmail.com                                                            #
@@ -27,7 +27,7 @@ class AngellistAlumniBot:
 		self.locationTagIdMap = {
 			'NYC':1664,
 			'SV':1681
-		}
+		} #maps a city string to angellist id for that location
 
 
 	def _findStartups(self, city, topPct, followMin):
