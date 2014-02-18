@@ -84,8 +84,12 @@ class AngellistQuakerBot:
 		return startupUrls, startupNames
 		
 	def _scrapeStartupPageForFounder(self, startupUrl):
-		response = urllib2.urlopen(startupUrl)
-		page_source = response.read()
+		try:
+			response = urllib2.urlopen(startupUrl)
+			page_source = response.read()
+		except:
+			#for some reaosn, if the startup's page on angellist doesn't exist or something
+			return None
 		lines = page_source.split('\n')
 		founderLine = ''
 		#hacky: use regex to scrape founder's name
@@ -105,7 +109,10 @@ class AngellistQuakerBot:
 		results = self.al.getSearch(self.al.access_token, query = founderName)
 		
 		#get first result's page
-		return results[0][0]['url']
+		try:
+			return results[0][0]['url']
+		except:
+			return None
 
 
 	def _getFounders(self, startupUrls):
@@ -132,19 +139,30 @@ class AngellistQuakerBot:
 		pbar.start()
 		count = 0
 		founderPages = []
+		newFounders = [] #founders that actually exist on angelList
 		for founderName in founderNames:
 			founderPage = self._getFounderPageFromName(founderName)
-			founderPages.append(founderPage)
 			count+=1
 			pbar.update(count)
+
+			if not founderPage == None:
+				founderPages.append(founderPage)
+				newFounders.append(founderName)
+			else:
+				continue
+
 		pbar.finish()
 
-		return founderPages, founderNames 
+		return founderPages, newFounders 
 
 
 	def _scrapePageForCollegeTag(self, founderPage):
-		response = urllib2.urlopen(founderPage)
-		page_source = response.read()
+		try:
+			response = urllib2.urlopen(founderPage)
+			page_source = response.read()
+		except:
+			#for some reason, if the person's angellist page doesn't exist or something
+			return None
 		lines = page_source.split('\n')
 		for line in lines:
 			if 'college-tag' in line:
@@ -184,8 +202,12 @@ class AngellistQuakerBot:
 	
 	def _getLinkedInUrl(self, founderPage):
 		#get linked in page from angellist founder page
-		response = urllib2.urlopen(founderPage)
-		page_source = response.read()
+		try:
+			response = urllib2.urlopen(founderPage)
+			page_source = response.read()
+		except:
+			#for some reason, if the person's angellist page doesn't exist
+			return None
 		lines = page_source.split('\n')
 		linkedinUrl = ''
 		for line in lines:
@@ -211,8 +233,14 @@ class AngellistQuakerBot:
 		else:
 			#then founder has a linked in page
 			#scrape for education, see if desired school is part of it
-			response = urllib2.urlopen(linkedInUrl)
-			page_source = response.read()
+			try:
+				response = urllib2.urlopen(linkedInUrl)
+				page_source = response.read()
+			except:
+				#probably an invalid url
+				return False
+
+
 			lines = page_source.split('\n')
 
 			schools = ''
