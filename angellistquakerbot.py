@@ -36,7 +36,7 @@ class AngellistQuakerBot:
 
 		#get all startups in city
 		startupUrls = []
-		startups = []
+		startupNames = []
 		pageCount = 1
 		count = 0
 		perPage = 50
@@ -56,7 +56,7 @@ class AngellistQuakerBot:
 					continue
 
 				startupUrls.append(startup['angellist_url'])
-				startups.append(startup['name'])
+				startupNames.append(startup['name'])
 				
 
 				#if we've reached a min follower count, break
@@ -80,7 +80,7 @@ class AngellistQuakerBot:
 			pageCount += 1
 		
 		
-		return startupUrls, startups
+		return startupUrls, startupNames
 		
 	def _scrapeStartupPageForFounder(self, startupUrl):
 		response = urllib2.urlopen(startupUrl)
@@ -109,7 +109,7 @@ class AngellistQuakerBot:
 
 	def _getFounders(self, startupUrls):
 		founderNames = []
-		print 'scraping founder names...'
+		print 'scraping founder names from AngelList startup pages...'
 		pbar = ProgressBar(maxval=len(startupUrls))
 		pbar.start()
 		#get startup page
@@ -126,7 +126,7 @@ class AngellistQuakerBot:
 		pbar.finish()
 
 		#for each founder name, search, grab id
-		print 'getting founder page for each founder...'
+		print 'getting AngelList founder page for each founder...'
 		pbar = ProgressBar(maxval=len(founderNames))
 		pbar.start()
 		count = 0
@@ -180,11 +180,74 @@ class AngellistQuakerBot:
 			return isAlumni
 		else:
 			return None
+	
+	def _getLinkedInUrl(self, founderPage):
+		#get linked in page from angellist founder page
+		response = urllib2.urlopen(founderPage)
+		page_source = response.read()
+		lines = page_source.split('\n')
+		linkedinUrl = ''
+		for line in lines:
+			if 'linked_in-link' in line:
+				try:
+					linkedinUrl = re.findall(r'<a href=\"(.*)\" class=\"linked_in\-link\"',line)[0]
+					
+					if linkedinUrl:
+						return linkedinUrl
+					else:
+						return None
+				except:
+					return None
 		
-	def 
+		return None
+
+	def _checkLinkedinAlmaMater(self, school, founderPage):
+		#first, get linked in from founder page, if there is one
+		linkedInUrl = self._getLinkedInUrl(founderPage)
+
+		if linkedInUrl==None:
+			return False
+		else:
+			#then founder has a linked in page
+			#scrape for education, see if desired school is part of it
+			response = urllib2.urlopen(linkedInUrl)
+			page_source = response.read()
+			lines = page_source.split('\n')
+
+			schools = ''
+			start = None
+			end = None
+			lineCount = 0
+			for line in lines:
+				if 'overview-summary-education-title' in line:
+					start = lineCount
+					
+				if start:
+					if '</dd>' in line:
+						end = lineCount
+						break
+
+				lineCount += 1
+			if not start==None and not end==None:
+				educationBlock = ' '.join(lines[start:end])
+				educations = re.findall(r'<a href=\".*?>(.*?)</a>',educationBlock)
+					
+				#check if alumni, for each education person has on linked in
+				for education in educations:
+					if self._isAlumni(education,school):
+						return True
+				return False
+
+			else:
+				#education section didn't exist on linkedin page
+				return False
 
 	def _getIsAlumniFromPage(self, school, foundersAndPages):
-		
+		print 'checking if each founder graduated from %s...' % (school)
+		pbar = ProgressBar(maxval=len(foundersAndPages))
+		pbar.start()
+		count = 0
+
 		founderIsAlumni = {}
 		for founder, founderPage in foundersAndPages:
 			#check if college tag matches
@@ -193,11 +256,16 @@ class AngellistQuakerBot:
 			if isAlmaMaterAngellist==None:
 				#check linkedin
 				isAlmaMaterLinkedin = self._checkLinkedinAlmaMater(school, founderPage)
-				ipdb.set_trace()
+
+				founderIsAlumni[founder] = isAlmaMaterLinkedin
 			else:
 				founderIsAlumni[founder] = isAlmaMaterAngellist
 
-		ipdb.set_trace()
+			count+=1
+			pbar.update(count)
+
+		pbar.finish()
+		
 		return founderIsAlumni
 
 	def findFounderAlumni(self, city='NYC', school='Penn', topPct = 0.10, followMin = None):
@@ -209,6 +277,10 @@ class AngellistQuakerBot:
 
 		#for each founder, find out if belong to input school: first angellist tag, then linkedin
 		isAlumni = self._getIsAlumniFromPage(school, zip(founders, founderPages))
+
+		isAlumniList = [isAlumni[founder] for founder in founders]
+
+		return zip(founders, startupNames, isAlumniList)
 
 		
 	

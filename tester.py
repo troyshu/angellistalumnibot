@@ -1,6 +1,12 @@
 import angellistquakerbot
 reload(angellistquakerbot)
 from angellistquakerbot import AngellistQuakerBot
+import ipdb as ipdb
 
 bot = AngellistQuakerBot()
-bot.findFounderAlumni(followMin = 10000)
+
+rez = bot.findFounderAlumni(followMin = 1000)
+
+ipdb.set_trace()
+
+
