@@ -7,6 +7,7 @@ import angellist
 reload(angellist)
 import urllib2
 from progressbar import *
+from pandas import DataFrame
 
 #######################################################################################
 # Scrapes AngelList for Upenn alumni.							                      #
@@ -280,7 +281,18 @@ class AngellistQuakerBot:
 
 		isAlumniList = [isAlumni[founder] for founder in founders]
 
-		return zip(founders, startupNames, isAlumniList)
+		rows = zip(founders, startupNames, isAlumniList)
+
+		resultDict = {}
+		for founder, startupName, isAlumni in rows:
+			newrow = {}
+			newrow['startup'] = startupName
+			newrow['isAlumni'] = isAlumni
+			resultDict[founder] = newrow
+
+		resultDf = DataFrame(resultDict).T
+
+		return resultDf
 
 		
 	
