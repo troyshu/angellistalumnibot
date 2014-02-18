@@ -10,7 +10,7 @@ from progressbar import *
 from pandas import DataFrame
 
 #######################################################################################
-# Scrapes AngelList for Upenn alumni.							                      #
+# Scrapes AngelList for alumni.							                      #
 #                                                                                     #
 # Author: Troy Shu                                                                    #
 # Email : tmshu1@gmail.com                                                            #
@@ -19,7 +19,7 @@ from pandas import DataFrame
 #######################################################################################
 
 
-class AngellistQuakerBot:
+class AngellistAlumniBot:
 	def __init__(self):
 		self.al = angellist.AngelList()
 		self.al.access_token = '436c4e00aa39c52f0c04e68a5373d407'

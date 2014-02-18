@@ -1,9 +1,9 @@
-import angellistquakerbot
-reload(angellistquakerbot)
-from angellistquakerbot import AngellistQuakerBot
+import angellistalumnibot
+reload(angellistalumnibot)
+from angellistalumnibot import AngellistAlumniBot
 import ipdb as ipdb
 
-bot = AngellistQuakerBot()
+bot = AngellistAlumniBot()
 
 rez = bot.findFounderAlumni(followMin = 20)
 
