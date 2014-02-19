@@ -22,6 +22,7 @@ from pandas import DataFrame
 class AngellistAlumniBot:
 	def __init__(self):
 		self.al = angellist.AngelList()
+		#this is my access token. if you have your own access token, please use it
 		self.al.access_token = '436c4e00aa39c52f0c04e68a5373d407'
 
 		self.locationTagIdMap = {
