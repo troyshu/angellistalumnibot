@@ -308,19 +308,12 @@ class AngellistAlumniBot:
 
 		#for each founder, find out if belong to input school: first angellist tag, then linkedin
 		isAlumni = self._getIsAlumniFromPage(school, foundersAndPages)
-		
-		ipdb.set_trace()
-
-		#THIS IS BUGGY, THINGS NOT IN ORDER
-		isAlumniList = [isAlumni[founder] for founder in founders]
-
-		rows = zip(founders, startupNames, isAlumniList)
 
 		resultDict = {}
-		for founder, startupName, isAlumni in rows:
+		for founder in isAlumni:
 			newrow = {}
-			newrow['startup'] = startupName
-			newrow['isAlumni'] = isAlumni
+			newrow['startup'] = foundersAndStartups[founder]
+			newrow['isAlumni'] = isAlumni[founder]
 			resultDict[founder] = newrow
 
 		resultDf = DataFrame(resultDict).T
