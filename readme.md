@@ -1,4 +1,4 @@
-angellistalumnibot
+AngelListAlumniBot
 ==================
 
 A class that scrapes AngelList for all startups given an input city (e.g. NYC), then scrapes the founder of each startup, then checks AngelList or LinkedIn to see whether founder is alumni of input school (e.g. Univeristy of Pennsylvania). 
@@ -22,4 +22,4 @@ rez now contains a DataFrame where the columns are founder name, startup name, a
 #Notes
 Currently only supports two cities, NYC and SV (Silicon Valley), and one school, Penn. Implementing the methods to support other cities and schools is pretty straightforward!
 
-The scraper/bot is also very slow, probably because it's making so many HTTP requests. An improvement for the future.
+The scraper/bot is also very slow, probably because it's making so many HTTP requests. An area of improvement for the future.
