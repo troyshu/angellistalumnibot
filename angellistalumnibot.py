@@ -115,45 +115,46 @@ class AngellistAlumniBot:
 			return None
 
 
-	def _getFounders(self, startupUrls):
-		founderNames = []
+	def _getFounders(self, startupUrls, startupNames):
+		startupUrlAndNames = zip(startupUrls, startupNames)
+
+		foundersAndStartups = {}
 		print 'scraping founder names from AngelList startup pages...'
 		pbar = ProgressBar(maxval=len(startupUrls))
 		pbar.start()
 		#get startup page
 		count = 0
-		for startupUrl in startupUrls:
+		for startupUrl, startupName in startupUrlAndNames:
 			#scrape founder pages from startup page
 			founderName = self._scrapeStartupPageForFounder(startupUrl)
 			if founderName:
-				founderNames.append(founderName)
-			
+				foundersAndStartups[founderName] = startupName
 			count+=1
 			pbar.update(count)
 		
 		pbar.finish()
 
+
 		#for each founder name, search, grab id
 		print 'getting AngelList founder page for each founder...'
-		pbar = ProgressBar(maxval=len(founderNames))
+		pbar = ProgressBar(maxval=len(foundersAndStartups.keys()))
 		pbar.start()
 		count = 0
-		founderPages = []
-		newFounders = [] #founders that actually exist on angelList
-		for founderName in founderNames:
+		foundersAndPages = {}
+		for founderName in foundersAndStartups.keys():
 			founderPage = self._getFounderPageFromName(founderName)
 			count+=1
 			pbar.update(count)
 
 			if not founderPage == None:
-				founderPages.append(founderPage)
-				newFounders.append(founderName)
+				foundersAndPages[founderName] = founderPage
+
 			else:
 				continue
 
 		pbar.finish()
 
-		return founderPages, newFounders 
+		return foundersAndPages, foundersAndStartups 
 
 
 	def _scrapePageForCollegeTag(self, founderPage):
@@ -278,7 +279,8 @@ class AngellistAlumniBot:
 		count = 0
 
 		founderIsAlumni = {}
-		for founder, founderPage in foundersAndPages:
+		for founder in foundersAndPages:
+			founderPage = foundersAndPages[founder]
 			#check if college tag matches
 			isAlmaMaterAngellist = self._checkCollegeTag(school, founderPage)
 			
@@ -302,11 +304,14 @@ class AngellistAlumniBot:
 		startupUrls, startupNames = self._findStartups(city, topPct, followMin)
 
 		#get founders of each startup
-		founderPages, founders = self._getFounders(startupUrls)
+		foundersAndPages, foundersAndStartups = self._getFounders(startupUrls, startupNames)
 
 		#for each founder, find out if belong to input school: first angellist tag, then linkedin
-		isAlumni = self._getIsAlumniFromPage(school, zip(founders, founderPages))
+		isAlumni = self._getIsAlumniFromPage(school, foundersAndPages)
+		
+		ipdb.set_trace()
 
+		#THIS IS BUGGY, THINGS NOT IN ORDER
 		isAlumniList = [isAlumni[founder] for founder in founders]
 
 		rows = zip(founders, startupNames, isAlumniList)

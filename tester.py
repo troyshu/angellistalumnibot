@@ -5,7 +5,7 @@ import ipdb as ipdb
 
 bot = AngellistAlumniBot()
 
-rez = bot.findFounderAlumni(followMin = 20)
+rez = bot.findFounderAlumni(followMin = 2000)
 
 ipdb.set_trace()
 
